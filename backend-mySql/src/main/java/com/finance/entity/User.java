@@ -2,6 +2,7 @@ package com.finance.entity;
 
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,10 +28,12 @@ public class User implements UserDetails {
 	private String password;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Income> incomes;
+	@JsonManagedReference // Add this annotation
+	private Map<Long,Income> incomes;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Expense> expenses;
+	@JsonManagedReference // Add this annotation
+	private Map<Long,Expense> expenses;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -66,19 +69,19 @@ public class User implements UserDetails {
 		this.password = password;
 	}
 
-	public List<Income> getIncomes() {
+	public Map<Long,Income> getIncomes() {
 		return incomes;
 	}
 
-	public void setIncomes(List<Income> incomes) {
+	public void setIncomes(Map<Long,Income> incomes) {
 		this.incomes = incomes;
 	}
 
-	public List<Expense> getExpenses() {
+	public Map<Long,Expense> getExpenses() {
 		return expenses;
 	}
 
-	public void setExpenses(List<Expense> expenses) {
+	public void setExpenses(Map<Long,Expense> expenses) {
 		this.expenses = expenses;
 	}
 
