@@ -23,7 +23,7 @@ public class Transaction {
     private Long userId; // Foreign key to User table
 
     @Enumerated(EnumType.STRING)
-    private TransactionType type; // INCOME, EXPENSE, RECURRING
+    private TransactionType type; // INCOME, EXPENSE, RECURRING, SAVINGS
 
     private String category; // e.g., "Rent", "Salary"
 
@@ -35,7 +35,7 @@ public class Transaction {
 
     private String description;
 
-    // Metadata
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 }
