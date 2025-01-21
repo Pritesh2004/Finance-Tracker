@@ -9,4 +9,8 @@ import java.util.List;
 @Repository
 public interface RecurringPaymentRepo extends JpaRepository<RecurringPayment, Long> {
     List<RecurringPayment> findByUserId(Long userId);
+
+    List<RecurringPayment> findByFrequencyAndIsActive(String daily, boolean b);
+
+    List<RecurringPayment> findByIsActive(boolean b);
 }

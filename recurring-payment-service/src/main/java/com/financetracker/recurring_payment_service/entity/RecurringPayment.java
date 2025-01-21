@@ -8,11 +8,10 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class RecurringPayment {
 
     @Id
@@ -21,24 +20,25 @@ public class RecurringPayment {
 
     private Long userId;
 
-    private String category; // e.g., "Netflix Subscription"
+    private String category;
 
     private BigDecimal amount;
 
-    private String currency; // e.g., "USD", "INR"
+    private String currency;
 
     @Enumerated(EnumType.STRING)
-    private Frequency frequency; // DAILY, WEEKLY, MONTHLY, YEARLY
+    private Frequency frequency;
+
+    private TransactionType transactionType;
 
     private LocalDate startDate;
 
-    private LocalDate endDate; // Nullable for indefinite recurrence
+    private LocalDate endDate;
 
     private String description;
 
     private Boolean isActive = true;
 
-    // Metadata
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

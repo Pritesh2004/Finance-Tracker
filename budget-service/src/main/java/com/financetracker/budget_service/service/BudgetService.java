@@ -72,6 +72,6 @@ public class BudgetService {
                                     });
                         })
                         .orElse(Mono.error(new RuntimeException("Budget not found"))))
-                .flatMap(mono -> mono);
+                .map(mono -> mono);
     }
 }

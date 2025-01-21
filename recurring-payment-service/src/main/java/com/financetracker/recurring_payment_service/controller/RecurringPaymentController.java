@@ -65,4 +65,11 @@ public class RecurringPaymentController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // Manually trigger the processing of recurring payments
+    @PostMapping("/process")
+    public ResponseEntity<String> processRecurringPayments() {
+        recurringPaymentService.processRecurringPayments();
+        return ResponseEntity.ok("Recurring payments processed successfully.");
+    }
 }

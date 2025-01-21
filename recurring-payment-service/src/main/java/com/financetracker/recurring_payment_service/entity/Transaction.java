@@ -1,4 +1,4 @@
-package com.financetracker.transaction_service.entity;
+package com.financetracker.recurring_payment_service.entity;
 
 
 import jakarta.persistence.*;
@@ -7,16 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-@Entity
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private Long userId;
