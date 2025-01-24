@@ -25,6 +25,7 @@
         <module>api-gateway</module>
         <module>service-registry</module>
         <module>recurring-payment-service</module>
+        <module>asset-service</module>
     </modules>
 
     <properties>
