@@ -19,6 +19,8 @@ public class Notification {
 
     private Long userId;  // The user to whom the notification belongs
 
+    private String email;
+
     private String message;  // The content of the notification
 
     private String notificationType;  // E.g., "BUDGET_EXCEEDED", "TRANSACTION_ALERT"

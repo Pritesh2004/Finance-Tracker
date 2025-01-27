@@ -1,8 +1,10 @@
 package com.financetracker.budget_service.controller;
 
+import com.financetracker.budget_service.client.UserClient;
 import com.financetracker.budget_service.entity.Budget;
 import com.financetracker.budget_service.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -16,9 +18,16 @@ public class BudgetController {
     @Autowired
     private BudgetService budgetService;
 
+    @Autowired
+    private UserClient userClient;
+
     // Create a new budget
     @PostMapping
     public ResponseEntity<Budget> createBudget(@RequestBody Budget budget) {
+        // Validate User Existence
+        if (!userClient.validateUserExistence(budget.getUserId())) {
+            throw new RuntimeException("User not found with ID: " + budget.getUserId());
+        }
         Budget savedBudget = budgetService.createBudget(budget);
         return ResponseEntity.ok(savedBudget);
     }
@@ -36,6 +45,17 @@ public class BudgetController {
         return budgetService.getBudgetById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user/{userId}/category/{category}")
+    public ResponseEntity<List<Budget>> getBudgetsByUserIdAndCategory(
+            @PathVariable Long userId,
+            @PathVariable String category) {
+        List<Budget> budgets = budgetService.getBudgetsByUserIdAndCategory(userId, category);
+        if (budgets.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(budgets);
     }
 
     // Update a budget

@@ -1,8 +1,10 @@
 package com.financetracker.transaction_service.controller;
 
+import com.financetracker.transaction_service.client.UserClient;
 import com.financetracker.transaction_service.entity.Transaction;
 import com.financetracker.transaction_service.entity.TransactionType;
 import com.financetracker.transaction_service.service.TransactionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,19 +17,19 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
     private final TransactionService transactionService;
-
-    @Autowired
-    public TransactionController(TransactionService transactionService) {
-        this.transactionService = transactionService;
-    }
+    private final UserClient userClient;
 
     // Create a new transaction
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+        if (!userClient.validateUserExistence(transaction.getUserId())) {
+            throw new RuntimeException("User not found with ID: " + transaction.getUserId());
+        }
         Transaction createdTransaction = transactionService.createTransaction(transaction);
         return new ResponseEntity<>(createdTransaction, HttpStatus.CREATED);
     }

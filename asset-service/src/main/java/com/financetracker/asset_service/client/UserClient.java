@@ -1,6 +1,6 @@
-package com.financetracker.transaction_service.client;
+package com.financetracker.asset_service.client;
 
-import com.financetracker.transaction_service.entity.User;
+import com.financetracker.asset_service.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;

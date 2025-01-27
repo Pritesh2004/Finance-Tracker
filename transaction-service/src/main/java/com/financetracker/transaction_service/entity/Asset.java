@@ -1,4 +1,4 @@
-package com.financetracker.asset_service.entity;
+package com.financetracker.transaction_service.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,13 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class Asset {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long userId;  // The user to whom the asset belongs

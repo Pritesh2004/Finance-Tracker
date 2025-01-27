@@ -39,6 +39,9 @@ public class BudgetService {
         return budgetRepository.findById(id);
     }
 
+    public List<Budget> getBudgetsByUserIdAndCategory(Long userId, String category) {
+        return budgetRepository.findByUserIdAndCategory(userId, category);
+    }
     // Update a budget
     public Budget updateBudget(Long id, Budget updatedBudget) {
         return budgetRepository.findById(id).map(existingBudget -> {

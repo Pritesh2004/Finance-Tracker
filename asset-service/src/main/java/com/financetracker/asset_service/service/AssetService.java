@@ -31,10 +31,14 @@ public class AssetService {
         Asset asset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new RuntimeException("Asset not found"));
 
-        asset.setValue(assetDetails.getValue());
+        asset.setCurrentValue(assetDetails.getCurrentValue());
         asset.setUpdatedAt(LocalDateTime.now());
         return assetRepository.save(asset);
     }
+    public Asset getCashAssetByUserId(Long userId) {
+        return assetRepository.findByUserIdAndType(userId, "Cash");
+    }
+
 
     // Delete an asset
     public void deleteAsset(Long assetId) {
