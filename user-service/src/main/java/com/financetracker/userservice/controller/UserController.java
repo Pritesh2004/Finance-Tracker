@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -37,7 +37,7 @@ public class UserController {
     private JwtUtil jwtUtils;
 
     // Generate token
-    @PostMapping("/generate-token")
+    @PostMapping("/login")
     public ResponseEntity<?> generateToken(@RequestBody JwtRequest jwtRequest) {
         try {
             authenticate(jwtRequest.getEmail(), jwtRequest.getPassword());
@@ -67,7 +67,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/")
+    @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
             User createdUser = userService.createUser(user);
