@@ -34,7 +34,7 @@ public class BudgetController {
 
     // Get all budgets for a user
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Budget>> getBudgetsByUserId(@PathVariable String userId) {
+    public ResponseEntity<List<Budget>> getBudgetsByUserId(@PathVariable Long userId) {
         List<Budget> budgets = budgetService.getBudgetsByUserId(userId);
         return ResponseEntity.ok(budgets);
     }

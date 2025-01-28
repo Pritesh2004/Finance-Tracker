@@ -30,7 +30,7 @@ public class BudgetService {
     }
 
     // Get all budgets for a user
-    public List<Budget> getBudgetsByUserId(String userId) {
+    public List<Budget> getBudgetsByUserId(Long userId) {
         return budgetRepository.findByUserId(userId);
     }
 

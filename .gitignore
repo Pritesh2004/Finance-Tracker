@@ -3,7 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-**/.env
+notification-service/src/main/resources/application.properties
 
 
 ### IntelliJ IDEA ###

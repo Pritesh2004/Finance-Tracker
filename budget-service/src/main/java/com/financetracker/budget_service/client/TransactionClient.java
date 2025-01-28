@@ -26,7 +26,7 @@ public class TransactionClient {
      * @param endDate   the end date of the budget period
      * @return a Mono containing the total spent amount
      */
-    public Mono<BigDecimal> getTotalSpentByCategory(String userId, String category, LocalDate startDate, LocalDate endDate) {
+    public Mono<BigDecimal> getTotalSpentByCategory(Long userId, String category, LocalDate startDate, LocalDate endDate) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api/transactions/spent")

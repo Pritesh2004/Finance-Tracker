@@ -25,6 +25,7 @@ public class NotificationService {
 
     // Send a notification email
     public void sendEmailNotification(String email, String subject, String message) {
+        System.out.println(defaultSender);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(defaultSender);
         mailMessage.setTo(email);
