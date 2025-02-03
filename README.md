@@ -18,7 +18,7 @@ The Finance Tracker application is organized into multiple microservices, each h
 - **Asset Management:** Track and manage user assets, including cash and investments.
 - **Financial Analytics:** Summarize and analyze user financial data to provide actionable insights.
 - **Notifications:** Email alerts for critical updates like budget limits and unusual transactions.
-
+- **Load Balancing:** The API Gateway uses Spring Cloud Gateway and Eureka for service discovery and load balancing across multiple service instances.
 ---
 
 ## Architecture
@@ -100,10 +100,10 @@ Generates summaries and insights from financial data.
 
 ## Technology Stack
 
-- **Backend:** Java, Spring Boot, Spring Cloud
+- **Backend:** Java, Spring Boot, Spring Cloud Gateway, Eureka
 - **Frontend:** Angular
 - **Database:** MySQL
-- **Authentication:** JWT
+- **Authentication:** JWT Authentication
 - **Communication:** REST APIs, WebClient
 - **Containerization:** Docker
 - **Other Tools:** Postman, Git

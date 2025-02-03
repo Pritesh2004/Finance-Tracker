@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().disable()
                 .authorizeRequests()
-                .requestMatchers("/user/generate-token", "/user/").permitAll()
+                .requestMatchers("/api/users/login", "/api/users/register").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated().and()
                 .sessionManagement()
