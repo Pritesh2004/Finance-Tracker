@@ -21,11 +21,8 @@ public class AssetController {
     private UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<Asset> createAsset(@RequestBody Asset asset) {
-        // Validate User Existence
-        if (!userClient.validateUserExistence(asset.getUserId())) {
-            throw new RuntimeException("User not found with ID: " + asset.getUserId());
-        }
+    public ResponseEntity<Asset> createAsset(@RequestBody Asset asset, @RequestHeader("Authorization") String authorizationHeader) {
+
         Asset createdAsset = assetService.createAsset(asset);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAsset);
     }
@@ -36,13 +33,13 @@ public class AssetController {
         return ResponseEntity.ok(assets);
     }
 
-    @GetMapping("/cash/{userId}")
-    public ResponseEntity<Asset> getCashAssetByUserId(@PathVariable Long userId) {
-        Asset cashAsset = assetService.getCashAssetByUserId(userId);
-        if (cashAsset == null) {
+    @GetMapping("/{userId}/{type}")
+    public ResponseEntity<List<Asset>> getAssetByUserIdAndType(@PathVariable Long userId, @PathVariable String type) {
+        List<Asset> asset = assetService.getAssetByUserIdAndType(userId, type);
+        if (asset == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(cashAsset);
+        return ResponseEntity.ok(asset);
     }
 
     @PutMapping("/{assetId}")

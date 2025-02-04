@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface AssetRepository extends JpaRepository<Asset, Long> {
     List<Asset> findByUserId(Long userId);
-    Asset findByUserIdAndType(Long userId, String type);
+    List<Asset> findByUserIdAndType(Long userId, String type);
 
 }

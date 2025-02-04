@@ -21,7 +21,8 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
 
     private static final List<String> OPEN_API_ENDPOINTS = List.of(
             "/api/users/login",
-            "/api/users/register"
+            "/api/users/register",
+            "/api/notifications/send"
     );
 
     public JwtAuthFilter() {

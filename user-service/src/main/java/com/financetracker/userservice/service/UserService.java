@@ -1,5 +1,6 @@
 package com.financetracker.userservice.service;
 
+import com.financetracker.userservice.client.NotificationClient;
 import com.financetracker.userservice.entity.User;
 import com.financetracker.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private NotificationClient notificationClient;
+
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public User createUser(User user) {
@@ -21,8 +25,11 @@ public class UserService {
             throw new RuntimeException("Email already exists: " + user.getEmail());
         }
         user.setPassword(this.bCryptPasswordEncoder.encode(user.getPassword()));
+        User newUser = userRepository.save(user);
 
-        return userRepository.save(user);
+        notificationClient.sendUserCreatedNotification((newUser));
+
+        return newUser;
     }
 
     public User updateUser(Long id, User updatedUser) {
