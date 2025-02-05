@@ -15,12 +15,12 @@ public class BudgetClient {
 
     @Autowired
     public BudgetClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://budget-service-url").build();
+        this.webClient = webClientBuilder.baseUrl("http://budget-service").build();
     }
 
     public List<Budget> getBudgetsByUserIdAndCategory(Long userId, String category) {
         return this.webClient.get()
-            .uri("/budgets/user/{userId}/category/{category}", userId, category)
+            .uri("/api/budgets/user/{userId}/category/{category}", userId, category)
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<Budget>>() {})
             .block();
@@ -28,7 +28,7 @@ public class BudgetClient {
 
     public void updateBudget(Budget budget) {
         this.webClient.put()
-            .uri("/budgets/{id}", budget.getId())
+            .uri("/api/budgets/{id}", budget.getId())
             .bodyValue(budget)
             .retrieve()
             .toBodilessEntity()

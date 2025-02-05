@@ -24,10 +24,7 @@ public class BudgetController {
     // Create a new budget
     @PostMapping
     public ResponseEntity<Budget> createBudget(@RequestBody Budget budget) {
-        // Validate User Existence
-        if (!userClient.validateUserExistence(budget.getUserId())) {
-            throw new RuntimeException("User not found with ID: " + budget.getUserId());
-        }
+
         Budget savedBudget = budgetService.createBudget(budget);
         return ResponseEntity.ok(savedBudget);
     }

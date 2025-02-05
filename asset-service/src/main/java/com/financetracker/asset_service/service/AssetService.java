@@ -49,6 +49,7 @@ public class AssetService {
                 .orElseThrow(() -> new RuntimeException("Asset not found"));
 
         asset.setCurrentValue(assetDetails.getCurrentValue());
+
         asset.setUpdatedAt(LocalDateTime.now());
         return assetRepository.save(asset);
     }

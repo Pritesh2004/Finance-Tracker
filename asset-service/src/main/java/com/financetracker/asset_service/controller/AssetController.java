@@ -1,6 +1,5 @@
 package com.financetracker.asset_service.controller;
 
-import com.financetracker.asset_service.client.UserClient;
 import com.financetracker.asset_service.entity.Asset;
 import com.financetracker.asset_service.service.AssetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,6 @@ public class AssetController {
 
     @Autowired
     private AssetService assetService;
-
-    @Autowired
-    private UserClient userClient;
 
     @PostMapping
     public ResponseEntity<Asset> createAsset(@RequestBody Asset asset, @RequestHeader("Authorization") String authorizationHeader) {

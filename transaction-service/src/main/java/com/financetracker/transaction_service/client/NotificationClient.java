@@ -1,13 +1,9 @@
-package com.financetracker.userservice.client;
+package com.financetracker.transaction_service.client;
 
-import com.financetracker.userservice.entity.User;
+import com.financetracker.transaction_service.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 @Component
 public class NotificationClient {
@@ -19,11 +15,11 @@ public class NotificationClient {
         this.webClient = webClientBuilder.baseUrl("http://notification-service").build();
     }
 
-    public void sendUserCreatedNotification(User user){
+    public void sendNotification(User user){
         Long userId = user.getId();
         String email = user.getEmail();
-        String message = "Welcome " + user.getFullName() + "! Your account has been created.";
-        String notificationType = "ACCOUNT_CREATED";
+        String message = "Hello " + user.getFullName() + "!Your budget limit exceeded.";
+        String notificationType = "BUDGET_EXCEEDED";
 
         webClient.post()
                 .uri(uriBuilder -> uriBuilder.path("/api/notifications/send")

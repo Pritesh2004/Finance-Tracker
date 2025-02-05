@@ -13,18 +13,5 @@ public class UserClient {
 
     private final WebClient.Builder webClientBuilder;
 
-    public boolean validateUserExistence(Long userId) {
-        try {
-            webClientBuilder.build()
-                    .get()
-                    .uri("http://USER-SERVICE/user/{id}", userId)
-                    .retrieve()
-                    .bodyToMono(User.class)
-                    .block(); // Blocking here for simplicity; consider non-blocking in real applications.
-            return true;
-        } catch (WebClientResponseException.NotFound e) {
-            return false;
-        }
-    }
 
 }

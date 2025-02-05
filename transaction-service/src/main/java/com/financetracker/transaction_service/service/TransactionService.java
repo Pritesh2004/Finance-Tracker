@@ -2,10 +2,9 @@ package com.financetracker.transaction_service.service;
 
 import com.financetracker.transaction_service.client.AssetClient;
 import com.financetracker.transaction_service.client.BudgetClient;
-import com.financetracker.transaction_service.entity.Asset;
-import com.financetracker.transaction_service.entity.Budget;
-import com.financetracker.transaction_service.entity.Transaction;
-import com.financetracker.transaction_service.entity.TransactionType;
+import com.financetracker.transaction_service.client.NotificationClient;
+import com.financetracker.transaction_service.client.UserClient;
+import com.financetracker.transaction_service.entity.*;
 import com.financetracker.transaction_service.repo.TransactionRepo;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +22,21 @@ import java.util.List;
 public class TransactionService {
 
     private final TransactionRepo transactionRepository;
-    private final WebClient.Builder webClientBuilder;
     private final AssetClient assetClient;
     private final BudgetClient budgetClient;
-
+    private final UserClient userClient;
+    private final NotificationClient notificationClient;
     @Autowired
-    public TransactionService(TransactionRepo transactionRepository, WebClient.Builder webClientBuilder, AssetClient assetClient, BudgetClient budgetClient) {
+    public TransactionService(TransactionRepo transactionRepository, AssetClient assetClient, BudgetClient budgetClient, UserClient userClient, NotificationClient notificationClient) {
         this.transactionRepository = transactionRepository;
-        this.webClientBuilder = webClientBuilder;
         this.assetClient = assetClient;
         this.budgetClient = budgetClient;
+        this.notificationClient = notificationClient;
+        this.userClient = userClient;
     }
 
     // Create a new transaction
-    public Transaction createTransaction(Transaction transaction) {
+    public Transaction createTransaction(Transaction transaction, String token) {
 
         // Handle Expense Transactions
         if (transaction.getType() == TransactionType.EXPENSE) {
@@ -44,7 +44,7 @@ public class TransactionService {
             updateCashAssetForExpense(transaction);
 
             // 2. Update Budget Service - Add spentAmount
-            updateBudgetForExpense(transaction);
+            updateBudgetForExpense(transaction, token);
         }
 
         // Handle Income Transactions
@@ -61,9 +61,12 @@ public class TransactionService {
     // Helper method to update cash asset for expense transactions
     private void updateCashAssetForExpense(Transaction transaction) {
         // Fetch the Cash Asset from Asset Service
-        Asset cashAsset = assetClient.getCashAssetByUserId(transaction.getUserId());
+        Asset cashAsset = assetClient.getCashAssetByUserId(transaction.getUserId(), "Cash");
 
         if (cashAsset != null) {
+            if(transaction.getAmount().compareTo(cashAsset.getCurrentValue())>0){
+                throw new RuntimeException("Low Cash asset: " + transaction.getUserId());
+            }
             BigDecimal newCashValue = cashAsset.getCurrentValue().subtract(transaction.getAmount());
             cashAsset.setCurrentValue(newCashValue);
             assetClient.updateAsset(cashAsset);  // Update Asset Service
@@ -73,7 +76,7 @@ public class TransactionService {
     }
 
     // Helper method to update budget for expense transactions
-    private void updateBudgetForExpense(Transaction transaction) {
+    private void updateBudgetForExpense(Transaction transaction, String token) {
         // Fetch the Budget for the user and category from Budget Service
         List<Budget> userBudgets = budgetClient.getBudgetsByUserIdAndCategory(transaction.getUserId(), transaction.getCategory());
 
@@ -83,7 +86,8 @@ public class TransactionService {
 
                 // Check if the spent amount exceeds the allocated amount
                 if (newSpentAmount.compareTo(budget.getAllocatedAmount()) > 0) {
-                    throw new RuntimeException("Budget exceeded for category: " + transaction.getCategory());
+                    User user = userClient.getUserById(transaction.getUserId(), token);
+                    notificationClient.sendNotification(user);
                 }
                 budget.setSpentAmount(newSpentAmount);
                 budgetClient.updateBudget(budget);  // Update Budget Service
@@ -94,7 +98,7 @@ public class TransactionService {
     // Helper method to update cash asset for income transactions
     private void updateCashAssetForIncome(Transaction transaction) {
         // Fetch the Cash Asset from Asset Service
-        Asset cashAsset = assetClient.getCashAssetByUserId(transaction.getUserId());
+        Asset cashAsset = assetClient.getCashAssetByUserId(transaction.getUserId(),"Cash");
 
         if (cashAsset != null) {
             BigDecimal newCashValue = cashAsset.getCurrentValue().add(transaction.getAmount());
@@ -120,6 +124,24 @@ public class TransactionService {
         return transactionRepository.findByUserIdAndType(userId, type);
     }
 
+
+    // Get transactions by date range and type
+    public List<Transaction> getTransactionsByDateRangeAndType(Long userId, LocalDate startDate, LocalDate endDate, String type) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        return transactionRepository.findByUserIdAndTransactionDateBetweenAndType(
+                userId, startDateTime, endDateTime, TransactionType.valueOf(type.toUpperCase()));
+    }
+
+    // Get transactions by date range and category
+    public List<Transaction> getTransactionsByDateRangeAndCategory(Long userId, LocalDate startDate, LocalDate endDate, String category) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        return transactionRepository.findByUserIdAndTransactionDateBetweenAndCategory(
+                userId, startDateTime, endDateTime, category);
+    }
     // Update a transaction
     public Transaction updateTransaction(Long id, Transaction updatedTransaction) {
         Transaction existingTransaction = getTransactionById(id);
@@ -138,15 +160,6 @@ public class TransactionService {
         transactionRepository.deleteById(id);
     }
 
-    public String getUserDetails(Long userId, String jwtToken) {
-        return webClientBuilder.build()
-                .get()
-                .uri("http://user-service/user/" + userId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken) // Include JWT token in the Authorization header
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-    }
 
     public BigDecimal getTotalSpentByCategory(Long userId, String category, LocalDate startDate, LocalDate endDate) {
         List<Transaction> transactions = transactionRepository.findByUserIdAndCategoryAndTransactionDateBetween(

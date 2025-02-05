@@ -1,12 +1,9 @@
 package com.financetracker.transaction_service.controller;
 
-import com.financetracker.transaction_service.client.UserClient;
 import com.financetracker.transaction_service.entity.Transaction;
 import com.financetracker.transaction_service.entity.TransactionType;
 import com.financetracker.transaction_service.service.TransactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,15 +19,12 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final UserClient userClient;
 
     // Create a new transaction
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
-        if (!userClient.validateUserExistence(transaction.getUserId())) {
-            throw new RuntimeException("User not found with ID: " + transaction.getUserId());
-        }
-        Transaction createdTransaction = transactionService.createTransaction(transaction);
+    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction, @RequestHeader("Authorization") String authorizationHeader ) {
+        System.out.println("Header - "+authorizationHeader);
+        Transaction createdTransaction = transactionService.createTransaction(transaction, authorizationHeader);
         return new ResponseEntity<>(createdTransaction, HttpStatus.CREATED);
     }
 
@@ -41,6 +35,27 @@ public class TransactionController {
         return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 
+    // Get transactions by date range and type
+    @GetMapping("/range/type")
+    public ResponseEntity<List<Transaction>> getTransactionsByDateRangeAndType(
+            @RequestParam Long userId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            @RequestParam String type) {
+        List<Transaction> transactions = transactionService.getTransactionsByDateRangeAndType(userId, startDate, endDate, type);
+        return ResponseEntity.ok(transactions);
+    }
+
+    // Get transactions by date range and category
+    @GetMapping("/range/category")
+    public ResponseEntity<List<Transaction>> getTransactionsByDateRangeAndCategory(
+            @RequestParam Long userId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate,
+            @RequestParam String category) {
+        List<Transaction> transactions = transactionService.getTransactionsByDateRangeAndCategory(userId, startDate, endDate, category);
+        return ResponseEntity.ok(transactions);
+    }
     // Get all transactions for a user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Transaction>> getTransactionsByUserId(@PathVariable Long userId) {
@@ -75,16 +90,6 @@ public class TransactionController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/user-details/{userId}")
-    public ResponseEntity<String> getUserDetails(
-            @PathVariable Long userId,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader
-    ) {
-        // Extract the JWT token
-        String jwtToken = authorizationHeader.replace("Bearer ", "");
-        String userDetails = transactionService.getUserDetails(userId, jwtToken);
-        return new ResponseEntity<>(userDetails, HttpStatus.OK);
-    }
 
     @GetMapping("/spent")
     public Mono<BigDecimal> getTotalSpentByCategory(

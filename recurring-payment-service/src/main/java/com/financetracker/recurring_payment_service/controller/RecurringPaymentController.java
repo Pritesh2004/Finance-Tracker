@@ -1,6 +1,5 @@
 package com.financetracker.recurring_payment_service.controller;
 
-import com.financetracker.recurring_payment_service.client.UserClient;
 import com.financetracker.recurring_payment_service.entity.RecurringPayment;
 import com.financetracker.recurring_payment_service.service.RecurringPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +14,10 @@ public class RecurringPaymentController {
 
     @Autowired
     private RecurringPaymentService recurringPaymentService;
-    @Autowired
-    private UserClient userClient;
-
 
     // Create a recurring payment
     @PostMapping
     public ResponseEntity<RecurringPayment> createRecurringPayment(@RequestBody RecurringPayment recurringPayment) {
-        // Validate User Existence
-        if (!userClient.validateUserExistence(recurringPayment.getUserId())) {
-            throw new RuntimeException("User not found with ID: " + recurringPayment.getUserId());
-        }
         RecurringPayment savedPayment = recurringPaymentService.createRecurringPayment(recurringPayment);
         return ResponseEntity.ok(savedPayment);
     }
